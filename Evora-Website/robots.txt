@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://evora.netlify.app/sitemap.xml

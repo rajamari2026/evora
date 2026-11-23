@@ -1,25 +1,50 @@
-# Evora website
+# Evora (Android app)
 
-Landing page + web app (sign in, view, download and send photos). Plain HTML, CSS and JavaScript. No build step.
+Private photo sharing for events: photos grouped by day, events, Liquid Glass design,
+WhatsApp batches of 100, chat-style sharing with accept-before-view, optional end-to-end encryption.
 
 ## Where the files go
-Upload everything in this folder to the ROOT of your `evora` GitHub repository (replace the existing files).
-Netlify rebuilds automatically after the commit.
+This package is the **app repository** (your `gallery` repo). Upload everything inside it to the repo root:
 
-    index.html  style.css  app.js  evora-crypto.js  jszip.min.js
-    netlify.toml  robots.txt  sitemap.xml  site.webmanifest
-    favicon.ico  favicon-32.png  icon-192.png  icon-512.png  apple-touch-icon.png  og.png
+    .github/workflows/build.yml
+    lib/            (all the app code)
+    tool/           (build helper, icons, signing key)
+    pubspec.yaml
+    supabase_setup.sql, supabase_hardening.sql
+    README.md, .gitignore
 
-Delete from that repo: `.github/workflows/static.yml` (the leftover GitHub Pages workflow) and any old copy of the page.
+Delete any other workflow files in `.github/workflows/` (for example `my-workflow.yml`, `static.yml`).
+The website is a different package (Evora-Website.zip) for the `evora` repo.
 
-## Security notes
-- `netlify.toml` sets a strict Content-Security-Policy and other headers. All scripts are local files (JSZip is included, not loaded from a CDN).
-- Signing out also revokes the session on the server.
-- The key inside `app.js` is the public project key. It is meant to be public.
+## Build the APK
+1. Commit the files. Open the **Actions** tab; the build starts by itself.
+2. When it is green, open the run and download **Evora-APK** from **Artifacts**.
+3. If a build fails, copy the "Error lines" box at the top of the run page and send it to Claude.
+   The build repairs known problems on its own (Android SDK versions, memory, file_picker).
+4. Every build uses the same signing key, so a new APK installs over the old one.
 
-## Getting found on Google
-1. Netlify > Project configuration > Access and security: turn OFF site password / visitor access. Google cannot index a password-protected site.
-2. If your address is not `https://evora.netlify.app/`, replace it in `index.html` (canonical, og:url, og:image, twitter:image, JSON-LD), `sitemap.xml` and `robots.txt`.
-3. Open search.google.com/search-console > Add property > URL prefix > your address. Choose "HTML tag", copy the tag into the commented line in `index.html` (remove the comment marks), commit, then click Verify.
-4. In Search Console: Sitemaps > add `sitemap.xml`. Then URL Inspection > paste your address > Request indexing.
-5. Wait a few days. "Evora" alone is a very common word (a city in Portugal and many brands), so also test searches like `Evora photo sharing app`.
+## Database (Supabase)
+- `supabase_setup.sql` created the sharing tables (already applied to your project).
+- Encryption tables are already applied too.
+- `supabase_hardening.sql` is NOT applied yet. Run it once in the Supabase SQL Editor.
+
+## Private sharing (end-to-end encryption)
+Turn it on in the Shared tab. Photos are locked on your phone with a key only you and the receiver have.
+Your encryption passcode unlocks your key on a new phone or on the website. If you forget it, private photos cannot be recovered.
+The share title, sender, receiver and photo count are not encrypted. Keys are not verified between people.
+
+## Notes
+- View only hides the save button and uses a lower-quality copy. Anyone who can see a photo on screen could still capture it.
+- Shared photos are re-encoded before upload, which removes location and camera data.
+- Delete in the gallery uses Android's own trash (Android 11 or newer).
+
+## Controlled app updates
+
+See [`EVORA_UPDATES_SETUP.md`](EVORA_UPDATES_SETUP.md) for the complete setup of:
+- Admin-only release preparation and publishing (inside the app and at the separate website's `/admin.html`).
+- Supabase release metadata and public APK download storage.
+- The manual **Prepare Evora Release** GitHub Actions workflow.
+- Android APK installation requirements and signing-key precautions.
+- The pending Firebase Cloud Messaging setup for push alerts.
+
+The existing push workflow may still build test APK artifacts after commits. Those builds are **not** sent to users. Only a release manually uploaded and changed to `published` by an authorized administrator appears in Evora's update checker.

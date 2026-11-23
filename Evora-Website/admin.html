@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Evora Admin · App Releases</title>
+  <link rel="icon" href="/favicon-32.png">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .admin-wrap{max-width:760px;margin:34px auto;padding:0 18px 70px}
+    .admin-card{padding:22px;margin:16px 0}
+    .admin-card h2{margin:0 0 12px}
+    .admin-card input,.admin-card textarea{width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin:7px 0}
+    .admin-card textarea{min-height:90px;resize:vertical}
+    .release{padding:14px 0;border-top:1px solid var(--line)}
+    .release:first-child{border-top:0}
+    .status{font-size:12px;letter-spacing:.06em;color:var(--dim)}
+    .admin-head{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+    .admin-head img{width:42px;height:42px;border-radius:12px}
+    .admin-head h1{margin:0;flex:1}
+    .check{display:flex;align-items:center;gap:10px;margin:12px 0}
+    .check input{width:auto;margin:0}
+  </style>
+</head>
+<body>
+  <main class="admin-wrap">
+    <header class="admin-head"><img src="/icon-192.png" alt="Evora"><h1>Evora Admin</h1><a class="btn ghost small" href="/">Website</a></header>
+    <section id="login" class="glass admin-card">
+      <h2>Administrator sign in</h2>
+      <p class="dim">Use your Evora account. Only accounts added to the admin allowlist can manage releases.</p>
+      <input id="email" type="email" autocomplete="username" placeholder="Email">
+      <input id="password" type="password" autocomplete="current-password" placeholder="Password">
+      <button id="signIn" class="btn mt">Sign in</button>
+      <p id="loginError" class="err" role="alert"></p>
+    </section>
+    <section id="panel" hidden>
+      <div class="row" style="justify-content:space-between;margin-bottom:14px">
+        <span id="signedIn" class="dim"></span>
+        <button id="signOut" class="btn ghost small">Sign out</button>
+      </div>
+      <section class="glass admin-card">
+        <h2>Prepare a release</h2>
+        <p class="dim">Uploading creates a prepared release only. It does not notify users until you publish it below.</p>
+        <input id="version" type="text" placeholder="Version name, e.g. 1.0.1">
+        <input id="code" type="number" min="1" step="1" placeholder="Android version code, e.g. 2">
+        <textarea id="notes" placeholder="Release notes"></textarea>
+        <label class="check"><input id="mandatory" type="checkbox"> Mandatory update</label>
+        <input id="apk" type="file" accept=".apk,application/vnd.android.package-archive">
+        <button id="prepare" class="btn mt">Upload APK and prepare</button>
+        <p id="prepareError" class="err" role="alert"></p>
+      </section>
+      <section class="glass admin-card">
+        <h2>Release history</h2>
+        <div id="releases" class="dim">Loading…</div>
+      </section>
+    </section>
+  </main>
+  <div id="toast" role="status"></div>
+  <script src="/admin.js"></script>
+</body>
+</html>

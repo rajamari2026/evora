@@ -1,0 +1,4 @@
+[functions.notify-release]
+# The function validates the bearer token with Supabase Auth and checks
+# public.app_admins itself before sending any notifications.
+verify_jwt = false
