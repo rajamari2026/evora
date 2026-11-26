@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evora: Private Photo Sharing for Events (Web and Android)</title>
-<meta name="description" content="Evora is a private photo sharing app. Group photos into events, share only what you choose, and let people view or download them from any browser. End-to-end encrypted option.">
-<link rel="canonical" href="https://evora.netlify.app/">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://qixnxntmaeeeyetwsgdy.supabase.co; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Veoa: Private Photo Sharing for Events (Web and Android)</title>
+<meta name="description" content="Veoa is a private photo sharing app. Group photos into events, share only what you choose, and let people view or download them from any browser. End-to-end encrypted option.">
+<link rel="canonical" href="https://rajamari2026.github.io/veoa/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#050507">
 
@@ -14,21 +16,21 @@
 -->
 
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Evora">
-<meta property="og:title" content="Evora: Private Photo Sharing for Events">
+<meta property="og:site_name" content="Veoa">
+<meta property="og:title" content="Veoa: Private Photo Sharing for Events">
 <meta property="og:description" content="Group photos into events and share only what you choose. View, download and send photos from your browser or your Android phone.">
-<meta property="og:url" content="https://evora.netlify.app/">
-<meta property="og:image" content="https://evora.netlify.app/og.png">
+<meta property="og:url" content="https://rajamari2026.github.io/veoa/">
+<meta property="og:image" content="https://rajamari2026.github.io/veoa/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Evora: Private Photo Sharing for Events">
+<meta name="twitter:title" content="Veoa: Private Photo Sharing for Events">
 <meta name="twitter:description" content="Group photos into events and share only what you choose. End-to-end encrypted option.">
-<meta name="twitter:image" content="https://evora.netlify.app/og.png">
+<meta name="twitter:image" content="https://rajamari2026.github.io/veoa/og.png">
 
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="style.css">
 
 <script type="application/ld+json">
 {
@@ -36,18 +38,18 @@
   "@graph": [
     {
       "@type": "WebSite",
-      "name": "Evora",
-      "alternateName": "Evora Photo Sharing",
-      "url": "https://evora.netlify.app/"
+      "name": "Veoa",
+      "alternateName": "Veoa Photo Sharing",
+      "url": "https://rajamari2026.github.io/veoa/"
     },
     {
       "@type": "SoftwareApplication",
-      "name": "Evora",
+      "name": "Veoa",
       "applicationCategory": "MultimediaApplication",
       "operatingSystem": "Web, Android",
       "description": "Private photo sharing app: group photos into events, share selected photos, accept-first sharing and optional end-to-end encryption.",
-      "url": "https://evora.netlify.app/",
-      "image": "https://evora.netlify.app/og.png",
+      "url": "https://rajamari2026.github.io/veoa/",
+      "image": "https://rajamari2026.github.io/veoa/og.png",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
   ]
@@ -58,16 +60,18 @@
 
 <div id="landing">
   <div class="top">
-    <img src="/icon-192.png" width="40" height="40" alt="Evora logo">
-    <span class="brand">Evora</span>
-    <a class="btn" href="#signin">Sign in</a>
+    <img src="icon-192.png" width="40" height="40" alt="Veoa logo">
+    <span class="brand">Veoa</span>
+    <a class="btn" href="#signin">Sign in or create account</a>
   </div>
 
   <main>
     <section class="hero">
       <h1>Private photo sharing for events</h1>
-      <p>Evora groups your photos by date and event, lets you share only the photos you choose, and gives the other person a simple page to view and download them. Nothing is visible until they accept.</p>
+      <p>Veoa groups your photos by date and event, lets you share only the photos you choose, and gives the other person a simple page to view and download them. Nothing is visible until they accept.</p>
       <a class="btn" href="#signin">Get started</a>
+      <p><a id="dl" class="btn ghost hidden" href="#">Download the Android app</a></p>
+      <p id="dlnote" class="dim"></p>
     </section>
 
     <section class="block" id="signin" aria-label="Sign in">
@@ -75,38 +79,38 @@
     </section>
 
     <section class="block" aria-labelledby="why">
-      <h2 id="why">Why people use Evora</h2>
+      <h2 id="why">Why people use Veoa</h2>
       <div class="cards">
         <div class="glass"><h3>Photos grouped into events</h3><p>Photos are organised by day. Name a day, or pick photos from different days, to build an event album.</p></div>
         <div class="glass"><h3>Accept before anyone sees</h3><p>When you share, the other person gets a request. They see nothing until they accept, and you can stop sharing at any time.</p></div>
         <div class="glass"><h3>End-to-end encrypted option</h3><p>Turn on private sharing and photos are locked on your device. Only you and the person you share with can open them.</p></div>
         <div class="glass"><h3>View, download and send in a browser</h3><p>Sign in on any computer to view shared photos, download one photo or a whole ZIP when the sender allows it, and send photos too.</p></div>
         <div class="glass"><h3>You choose: view only or download</h3><p>Every share has its own setting. View-only shares hide the save button and use a lower-quality copy.</p></div>
-        <div class="glass"><h3>Built for Android</h3><p>The Evora Android app reads your phone gallery, supports pinch zoom, swipe select and sends photos in batches.</p></div>
+        <div class="glass"><h3>Built for Android</h3><p>The Veoa Android app reads your phone gallery, supports pinch zoom, swipe select and sends photos in batches.</p></div>
       </div>
     </section>
 
     <section class="block" aria-labelledby="how">
-      <h2 id="how">How Evora photo sharing works</h2>
+      <h2 id="how">How Veoa photo sharing works</h2>
       <ol class="steps">
-        <li><strong>Pick photos.</strong> Select a few photos or a whole event in the Evora app, or choose files in your browser.</li>
+        <li><strong>Pick photos.</strong> Select a few photos or a whole event in the Veoa app, or choose files in your browser.</li>
         <li><strong>Send to a person.</strong> Enter their email once. Next time just pick their name.</li>
-        <li><strong>They accept.</strong> They sign in to Evora on the web or the app, accept the request and see the photos.</li>
+        <li><strong>They accept.</strong> They sign in to Veoa on the web or the app, accept the request and see the photos.</li>
         <li><strong>View or download.</strong> If you allowed downloads they can save single photos or the whole album as a ZIP.</li>
       </ol>
     </section>
 
     <section class="block" aria-labelledby="faq">
-      <h2 id="faq">Questions about Evora</h2>
-      <details class="glass"><summary>Is Evora free?</summary><p>Yes, Evora is free to use.</p></details>
+      <h2 id="faq">Questions about Veoa</h2>
+      <details class="glass"><summary>Is Veoa free?</summary><p>Yes, Veoa is free to use.</p></details>
       <details class="glass"><summary>Are my photos private?</summary><p>Photos are shared only with the people you pick. They must accept first and you can stop sharing at any time, which deletes the shared copies. With end-to-end encryption on, only you and the receiver can open the photos, not even the server.</p></details>
       <details class="glass"><summary>Can people download my photos?</summary><p>Only if you allow it for that share. Anyone who can see a photo on their screen could still capture it, so share view-only photos only with people you trust.</p></details>
-      <details class="glass"><summary>Does Evora work on iPhone?</summary><p>The Evora mobile app is for Android. The website works in any modern browser on a computer, iPhone or Android phone.</p></details>
+      <details class="glass"><summary>Does Veoa work on iPhone?</summary><p>The Veoa mobile app is for Android. The website works in any modern browser on a computer, iPhone or Android phone.</p></details>
       <details class="glass"><summary>Do I need an account?</summary><p>Yes. Create a free account with your email so the right person receives the photos you share.</p></details>
     </section>
   </main>
 
-  <footer class="site">Evora, private photo sharing for events.</footer>
+  <footer class="site">Veoa, private photo sharing for events.</footer>
 </div>
 
 <div id="app" class="wrap" hidden></div>
@@ -118,9 +122,10 @@
   <button class="nav next" id="lbNext" aria-label="Next">&#8250;</button>
 </div>
 <div id="toast" role="status"></div>
-<noscript><p>Evora needs JavaScript to sign in and show your photos.</p></noscript>
+<noscript><p>Veoa needs JavaScript to sign in and show your photos.</p></noscript>
 
-<script src="/evora-crypto.js"></script>
-<script src="/app.js"></script>
+<script src="evora-crypto.js"></script>
+<script src="jszip.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

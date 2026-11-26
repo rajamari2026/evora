@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://evora.netlify.app/sitemap.xml
+Sitemap: https://rajamari2026.github.io/veoa/sitemap.xml

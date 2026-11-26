@@ -4,6 +4,7 @@
   const SB = 'https://qixnxntmaeeeyetwsgdy.supabase.co';
   const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpeG54bnRtYWVlZXlldHdzZ2R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNzE0ODEsImV4cCI6MjEwODg0NzQ4MX0.FIAPEiucXRikt9PdNtgUc5wCO1TMaCaUTkUfaKbHCeg'; // public project key (safe to publish; data is protected by login + database rules)
   const C = window.EvoraCrypto;
+  const SITE = location.origin + location.pathname.replace(/index\.html$/, '');
   const $ = (s, r) => (r || document).querySelector(s);
 
   function el(tag, props, ...kids) {
@@ -58,12 +59,42 @@
     return r;
   }
   const J = { 'Content-Type': 'application/json' };
-  async function errOf(r, fallback) { try { return (await r.json()).message || fallback; } catch (e) { return fallback; } }
+  async function errOf(r, fallback) { try { const j = await r.json(); return j.message || j.msg || j.error_description || fallback; } catch (e) { return fallback; } }
   async function rpc(name, body) {
     const r = await api('/rest/v1/rpc/' + name, { method: 'POST', headers: J, body: JSON.stringify(body) });
     if (!r.ok) throw new Error(await errOf(r, 'Request failed'));
     return r.json();
   }
+  async function googleEnabled() {
+    try {
+      const r = await fetch(SB + '/auth/v1/settings', { headers: { apikey: KEY } });
+      const j = await r.json();
+      return !!(j.external && j.external.google);
+    } catch (e) { return false; }
+  }
+
+  // Links from emails (confirm account, reset password) and Google sign-in come back with the login in the address.
+  let recovery = false;
+  async function consumeAuthHash() {
+    const h = location.hash.replace(/^#/, '');
+    if (!h || h.indexOf('=') < 0) return;
+    const p = new URLSearchParams(h);
+    const bad = p.get('error_description') || p.get('error');
+    const access = p.get('access_token');
+    if (!bad && !access) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    if (bad) { toast(bad); return; }
+    try {
+      const r = await fetch(SB + '/auth/v1/user', { headers: { apikey: KEY, Authorization: 'Bearer ' + access } });
+      if (!r.ok) throw new Error('This link did not work. Request a new one.');
+      const u = await r.json();
+      save({ access, refresh: p.get('refresh_token') || '', email: (u.email || '').toLowerCase(), uid: u.id });
+      const type = p.get('type') || '';
+      if (type === 'recovery') recovery = true;
+      else toast(type === 'signup' ? 'Email confirmed. Welcome to Veoa!' : 'Signed in.');
+    } catch (e) { toast(e.message); }
+  }
+
   async function publicKeyOf(email) {
     const e = email.toLowerCase();
     try { const v = await rpc('public_key_of', { p_email: e }); return v || null; }
@@ -361,6 +392,10 @@
     const err = el('div', { class: 'err' });
     const go = el('button', { class: 'btn mt', text: 'Sign in' });
     const sw = el('button', { class: 'btn ghost mt', text: 'Create a new account' });
+    const google = el('button', { class: 'btn ghost hidden', text: 'Continue with Google' });
+    google.onclick = () => { location.href = SB + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(SITE); };
+    googleEnabled().then((ok) => { if (ok) google.classList.remove('hidden'); });
+    const forgot = el('button', { class: 'btn ghost small', text: 'Forgot password?', onclick: () => forgotDialog(email.value) });
     async function submit() {
       err.textContent = ''; go.disabled = true;
       try {
@@ -380,15 +415,55 @@
       pass.setAttribute('autocomplete', create ? 'new-password' : 'current-password');
     };
     return el('div', { class: 'glass login' },
-      el('h2', { text: 'Sign in to Evora' }),
-      el('div', { class: 'dim', text: 'Use the same email and password as in the Evora app. You see photos only after you accept them.' }),
-      email, pass, err, go, sw);
+      el('h2', { text: 'Sign in to Veoa' }),
+      el('div', { class: 'dim', text: 'Use the same email and password as in the Veoa app. You see photos only after you accept them.' }),
+      email, pass, err, go, google, forgot, sw);
+  }
+
+  function forgotDialog(prefill) {
+    const email = el('input', { type: 'email', placeholder: 'Your email', value: prefill || '', autocomplete: 'username' });
+    const msg = el('div', { class: 'dim mt' });
+    const go = el('button', { class: 'btn', text: 'Send reset link' });
+    go.onclick = async () => {
+      const e = email.value.trim().toLowerCase();
+      if (!isEmail(e)) { msg.textContent = 'Enter your email address.'; return; }
+      go.disabled = true;
+      try {
+        const r = await fetch(SB + '/auth/v1/recover?redirect_to=' + encodeURIComponent(SITE), {
+          method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e }) });
+        msg.textContent = r.ok ? 'If that email has an account, a reset link is on its way. Check your spam folder too.' : await errOf(r, 'Could not send the email.');
+      } catch (x) { msg.textContent = 'Could not connect. Try again.'; }
+      go.disabled = false;
+    };
+    dialog([el('h2', { text: 'Reset password' }),
+      el('p', { class: 'dim', text: 'We email you a link. Open it on this device to choose a new password.' }),
+      email, msg, el('div', { class: 'row mt' }, go, el('button', { class: 'btn ghost', text: 'Close', onclick: () => closeDialog() }))]);
+  }
+
+  function newPasswordView() {
+    const pass = el('input', { type: 'password', placeholder: 'New password (at least 8 characters)', autocomplete: 'new-password' });
+    const again = el('input', { type: 'password', placeholder: 'Repeat new password', autocomplete: 'new-password' });
+    const err = el('div', { class: 'err' });
+    const go = el('button', { class: 'btn mt', text: 'Save new password' });
+    go.onclick = async () => {
+      err.textContent = '';
+      if (pass.value.length < 8) { err.textContent = 'Use at least 8 characters.'; return; }
+      if (pass.value !== again.value) { err.textContent = 'The passwords do not match.'; return; }
+      go.disabled = true;
+      try {
+        const r = await api('/auth/v1/user', { method: 'PUT', headers: J, body: JSON.stringify({ password: pass.value }) });
+        if (!r.ok) throw new Error(await errOf(r, 'Could not change the password.'));
+        recovery = false; toast('Password changed.'); await loadShares();
+      } catch (e) { err.textContent = e.message; go.disabled = false; }
+    };
+    return el('div', { class: 'glass login mt' }, el('h2', { text: 'Choose a new password' }),
+      el('div', { class: 'dim', text: 'You are signed in with the reset link. Pick a new password for your Veoa account.' }), pass, again, err, go);
   }
 
   function header() {
     return el('header', { class: 'appbar' },
-      el('img', { src: '/icon-192.png', width: '40', height: '40', alt: 'Evora logo' }),
-      el('h1', { text: 'Evora' }),
+      el('img', { src: 'icon-192.png', width: '40', height: '40', alt: 'Veoa logo' }),
+      el('h1', { text: 'Veoa' }),
       el('span', { class: 'dim', text: session.email }),
       el('button', { class: 'btn ghost small', text: 'Refresh', onclick: loadShares }),
       el('button', { class: 'btn ghost small', text: 'Sign out', onclick: signOut }));
@@ -446,7 +521,7 @@
     pass.addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
     return el('div', { class: 'glass login mt' },
       el('h2', { text: 'Private photos' }),
-      el('div', { class: 'dim', text: 'These photos are end-to-end encrypted. Enter the encryption passcode you set in Evora. It never leaves this page.' }),
+      el('div', { class: 'dim', text: 'These photos are end-to-end encrypted. Enter the encryption passcode you set in Veoa. It never leaves this page.' }),
       pass, err, go);
   }
 
@@ -602,9 +677,29 @@
       return;
     }
     landing.hidden = true; app.hidden = false;
+    if (recovery) { app.replaceChildren(header(), newPasswordView()); return; }
     app.replaceChildren(header(), album ? albumView() : mainView());
   }
 
-  render();
-  if (session) loadShares();
+  async function loadDownload() {
+    const a = $('#dl');
+    if (!a) return;
+    try {
+      const r = await fetch(SB + '/rest/v1/app_releases?select=version_name,apk_url&status=eq.published&order=version_code.desc&limit=1',
+        { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } });
+      const rows = r.ok ? await r.json() : [];
+      if (!rows.length) return;
+      a.href = rows[0].apk_url;
+      a.textContent = 'Download the Android app (v' + rows[0].version_name + ')';
+      a.classList.remove('hidden');
+      $('#dlnote').textContent = 'After it downloads, open the file and tap Install. Android may ask you to allow installs from your browser.';
+    } catch (e) { /* no release published yet */ }
+  }
+  loadDownload();
+
+  (async () => {
+    await consumeAuthHash();
+    render();
+    if (session && !recovery) loadShares();
+  })();
 })();
